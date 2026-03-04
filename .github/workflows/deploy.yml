@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - main
+  workflow_dispatch:
 
 jobs:
   build-and-deploy:
@@ -35,8 +36,8 @@ jobs:
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
 
+      - name: Zip standalone package
+        run: cd .next/standalone && zip -r ../../deploy.zip . -x "node_modules/.cache/*"
+
       - name: Deploy to Azure Web App
-        uses: azure/webapps-deploy@v3
-        with:
-          app-name: highstreet-health
-          package: .next/standalone
+        run: az webapp deploy --name highstreet-health --resource-group AlliedSuite-RG-EU --src-path deploy.zip --type zip --async true
